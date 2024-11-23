@@ -23,10 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <h1 class="flex justify-center text-xl"> Xin chào đến với Hoàng Anh Channel! </h1>
         </div>
 
-        <div id="content" class="grid grid-col-1 sm:grid-cols-1 border-gray-900/10">
+    
               
-            <!-- Bộ office -->
-                <div id="office" class="mt-5 mx-10 flex justify-start">
-                </div>
 
     
