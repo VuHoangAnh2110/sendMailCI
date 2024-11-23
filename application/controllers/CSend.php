@@ -1,3 +1,7 @@
+	<!-- Controller này để test hàm exec() 
+	Hiện tại chưa có tác dụng
+	-->
+
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -13,7 +17,6 @@ class CSend extends CI_Controller {
         $this->load->helper('url');
 		$this->load->library('session');
 		$this->load->library('Lib_Mailer');
-
     }
     
     public function index(){
