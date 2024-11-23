@@ -18,16 +18,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     </button>
                 </div>
                 <h4 class="text-sm flex justify-center items-center mr-20"> 2024 © by Vu Hoang Anh </h4>                      
-            </div>
-            
+            </div>            
         </div>
-    </div>
    
     <script src="{$base_url}application/assets/toastr/jquery.js"></script>
     <script src="{$base_url}application/assets/toastr/toastr.min.js"></script>
     <script src="{$base_url}application/assets/index.js"></script>
 
-    
-    
 </body>
 </html>
