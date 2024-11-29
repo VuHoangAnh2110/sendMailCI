@@ -167,4 +167,8 @@ class CSendMail extends CI_Controller {
 	}
 	
 
+	public function genPlaceHolder(){
+		
+	}
+
 }
