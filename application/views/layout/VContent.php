@@ -55,15 +55,21 @@
                         class="w-50 bg-indigo-500 text-white font-bold py-2 px-4 rounded hover:bg-indigo-600">
                             Trộn và gửi email
                         </button>
+
+                        <button type="button" id="genph"
+                        class="w-50 bg-gray-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-600">
+                            Chọn placeholder
+                        </button>
                     </div>
                 </div>
 
                 <!-- Tự xuất các place holder để người dùng chọn -->
                 <div id="placeholders" class="sm:col-span-2 ">
-                    <div id="addplace" class="bg-gray-100 border-blue-800 rounded-lg shadow-md p-5">
+                    <div class="bg-gray-100 border-blue-800 rounded-lg shadow-md p-5">
                         <h1 class="text-2xl font-bold mb-4">Select Placeholder</h1>
                         <!-- Add placeholder -->
-
+                        <div id="addplace">
+                        </div>
                     </div>
                 </div>
             </div>
