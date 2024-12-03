@@ -94,6 +94,10 @@ class CSendMail extends CI_Controller {
 			// $this->sendMailAsync();
 			redirect(base_url());
 		}
+
+		// if ($action == 'gen'){
+		// 	$this->genPlaceHolder();
+		// }
 	}
 
 	public function sendMail(){
@@ -168,7 +172,53 @@ class CSendMail extends CI_Controller {
 	
 
 	public function genPlaceHolder(){
-		
+		 // Lấy nội dung từ request Ajax
+		 $emailContent = $this->input->post('email_content');
+		 $action = $this->input->post('action');  // Xác định nút được nhấn
+
+		 // Kiểm tra nếu có file Excel tải lên
+		 if (isset($_FILES['data_file']) && $_FILES['data_file']['error'] == UPLOAD_ERR_OK) {
+			 $filePath = $_FILES['data_file']['tmp_name'];
+			 $reader = new Xlsx();
+			 $spreadsheet = $reader->load($filePath);
+			 $sheet = $spreadsheet->getActiveSheet();
+			 $data = $sheet->toArray();
+ 
+			 if ($action == 'gen') {
+				$firstRow = $data[0];
+				$listName = [];
+				 // Lưu vào database
+				 foreach ($firstRow as $index => $value) {
+					$nameValue = "cot_".($index+1);
+					$listName[$nameValue] = $value;					
+				 }
+			 }
+		 }
+
+		 // Kiểm tra chuỗi có chứa <<>> hay không
+		 preg_match_all('/<<([^>]+)>>/', $emailContent, $matches);
+ 
+		 if (!empty($matches[1])) {
+			 $placeholders = $matches[1]; // Lấy nội dung bên trong <<>>
+ 
+			 // Tạo danh sách HTML các label và select
+			 $output = '';
+			 foreach ($placeholders as $placeholder) {
+				 $output .= '
+					 <label class="block text-gray-700 font-medium mb-2">' . htmlspecialchars($placeholder) . ':</label>
+					 <select name="' . htmlspecialchars($placeholder) . '" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200 focus:border-indigo-300 p-3 mb-4">
+					';
+					// foreach ($listName as $key => $val){
+					// 	$output .= '<option value="'. htmlspecialchars($key) . '">'. htmlspecialchars($val) .'</option>';
+					// }
+					$output .= '</select>';
+			 }
+ 
+			 // Trả về dữ liệu JSON
+			 echo json_encode(['status' => 'success', 'html' => $output]);
+		 } else {
+			 echo json_encode(['status' => 'error', 'message' => 'Không tìm thấy placeholder nào trong nội dung email.']);
+		 }
 	}
 
 }
