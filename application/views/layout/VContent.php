@@ -56,6 +56,7 @@
                             Trộn và gửi email
                         </button>
 
+                        <!-- <button type="submit" name="action" value="gen"  -->
                         <button type="button" id="genph"
                         class="w-50 bg-gray-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-600">
                             Chọn placeholder
