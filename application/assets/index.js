@@ -45,6 +45,7 @@ function ThongBao(type, msg, title){
     toastr[type](msg, title);
 };
 
+// =====================================================================
 function add(){
     let formData = new FormData($('#mailForm')[0]);
     $.ajax({
@@ -64,10 +65,12 @@ function add(){
     });
     return false; // Ngăn chặn việc tải lại trang
 }
+// =====================================================================
 
-// Bắt các placeholder khi nhập vào input
+// Bắt các placeholder khi nhập vào input ========================================================
+//cách 1:
     $(document).ready(function () {
-        $('#genph').on('click', function () {
+        $('#genph1').on('click', function () {
             let email = $('#email_content').val();
 
             // Tìm kiếm các chuỗi nằm trong <<>>
@@ -99,3 +102,27 @@ function add(){
             }
         });
     });
+
+// cách 2:
+$(document).ready(function () {
+    $('#genph').on('click', function () {
+        let emailContent = $('#email_content').val();
+
+        $.ajax({
+            url: 'CSendMail/genPlaceHolder', // Đường dẫn tới controller
+            type: 'POST',
+            data: { email_content: emailContent },
+            dataType: 'json',
+            success: function (response) {
+                if (response.status === 'success') {
+                    $('#addplace').html(response.html); // InnerHTML với kết quả từ server
+                } else {
+                    alert(response.message); // Hiển thị lỗi nếu không tìm thấy placeholder
+                }
+            },
+            error: function () {
+                alert('Đã xảy ra lỗi trong quá trình xử lý.');
+            }
+        });
+    });
+});
