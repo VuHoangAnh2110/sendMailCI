@@ -175,6 +175,7 @@ class CSendMail extends CI_Controller {
 		 // Lấy nội dung từ request Ajax
 		 $emailContent = $this->input->post('email_content');
 		 $action = $this->input->post('action');  // Xác định nút được nhấn
+		 $listName = [];
 
 		 // Kiểm tra nếu có file Excel tải lên
 		 if (isset($_FILES['data_file']) && $_FILES['data_file']['error'] == UPLOAD_ERR_OK) {
@@ -184,9 +185,8 @@ class CSendMail extends CI_Controller {
 			 $sheet = $spreadsheet->getActiveSheet();
 			 $data = $sheet->toArray();
  
-			 if ($action == 'gen') {
+			 if (!empty($data) && isset($data[0])) {
 				$firstRow = $data[0];
-				$listName = [];
 				 // Lưu vào database
 				 foreach ($firstRow as $index => $value) {
 					$nameValue = "cot_".($index+1);
@@ -208,9 +208,9 @@ class CSendMail extends CI_Controller {
 					 <label class="block text-gray-700 font-medium mb-2">' . htmlspecialchars($placeholder) . ':</label>
 					 <select name="' . htmlspecialchars($placeholder) . '" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200 focus:border-indigo-300 p-3 mb-4">
 					';
-					// foreach ($listName as $key => $val){
-					// 	$output .= '<option value="'. htmlspecialchars($key) . '">'. htmlspecialchars($val) .'</option>';
-					// }
+					foreach ($listName as $key => $val){
+						$output .= '<option value="'. htmlspecialchars($key) . '">'. htmlspecialchars($val) .'</option>';
+					}
 					$output .= '</select>';
 			 }
  
