@@ -10,6 +10,7 @@ class CSendMail extends CI_Controller {
 	public function __construct() {
         parent::__construct();
         $this->load->model('MSendMail');
+		$this->load->model('MTemplate');
         $this->load->helper('url');
 		$this->load->library('session');
 		$this->load->library('Lib_Mailer');
@@ -71,12 +72,20 @@ class CSendMail extends CI_Controller {
                     if ($index == 0) continue; // Bỏ qua dòng tiêu đề nếu có
 
                     $recipientEmail = $row[0];
+					//Tạo id cho template
+					$id_temp = $this->generateId();
+
+					$this->MTemplate->insert_template([
+						'id_template' => $id_temp,
+						'content' => $emailContent
+					]);
 
                     $this->MSendMail->insert_mail([
                         'noi_dung' => $emailContent,
                         'nguoi_nhan' => $recipientEmail,
                         'nguoi_gui' => 'vhanh2k4@gmail.com',
-                        'trang_thai' => 'chưa'
+                        'trang_thai' => 'chưa',
+						'id_template' => $id_temp
                     ]);
                 }
                 $this->session->set_flashdata('success', 'Đã lưu các email vào cơ sở dữ liệu.');
@@ -95,9 +104,6 @@ class CSendMail extends CI_Controller {
 			redirect(base_url());
 		}
 
-		// if ($action == 'gen'){
-		// 	$this->genPlaceHolder();
-		// }
 	}
 
 	public function sendMail(){
@@ -221,4 +227,19 @@ class CSendMail extends CI_Controller {
 		 }
 	}
 
+	//Tạo id random cho table template
+	function generateId() {
+		// Tạo 3 chữ cái ngẫu nhiên
+		$letters = strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 3));
+	
+		// Lấy ngày, tháng, năm hiện tại
+		$day = date('d'); // Ngày
+		$month = date('m'); // Tháng
+		$year = date('y'); // Năm
+	
+		// Ghép các thành phần thành ID
+		$Id = $letters . $day . $month . $year;
+	
+		return $Id;
+	}
 }
