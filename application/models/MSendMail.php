@@ -50,4 +50,5 @@ class MSendMail extends CI_Model {
             "thoi_gian_gui" => date("Y-m-d H:i:s") // Lưu thời gian gửi thành công
         ]);
     }
+
 }
