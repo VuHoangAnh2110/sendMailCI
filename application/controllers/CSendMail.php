@@ -5,6 +5,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use PhpOffice\PhpSpreadsheet\Calculation\Information\Value;
 
 class CSendMail extends CI_Controller {
 	public function __construct() {
@@ -32,6 +33,7 @@ class CSendMail extends CI_Controller {
 	 * map to /index.php/welcome/<method_name>
 	 * @see https://codeigniter.com/userguide3/general/urls.html
 	 */
+	
 	public function index()
 	{
 		$data = array(
@@ -48,6 +50,7 @@ class CSendMail extends CI_Controller {
 		$this->load->view('layout/VLayout', $data1);
 	}
 
+// Lưu nội dung thư,... vào database
 	public function Save_DB(){
 		$emailContent = $this->input->post('email_content');
         $action = $this->input->post('action');  // Xác định nút được nhấn
@@ -68,20 +71,20 @@ class CSendMail extends CI_Controller {
 
             if ($action == 'save') {
                 // Lưu vào database
+				//Tạo id cho template
+				$id_temp = $this->generateId();
+
+				$this->MTemplate->insert_template([
+					'id_template' => $id_temp,
+					'content' => $this->ReContent($emailContent)
+				]);
                 foreach ($data as $index => $row) {
                     if ($index == 0) continue; // Bỏ qua dòng tiêu đề nếu có
-
+					if ($row[0] == null) continue;
                     $recipientEmail = $row[0];
-					//Tạo id cho template
-					$id_temp = $this->generateId();
-
-					$this->MTemplate->insert_template([
-						'id_template' => $id_temp,
-						'content' => $emailContent
-					]);
-
+				
                     $this->MSendMail->insert_mail([
-                        'noi_dung' => $emailContent,
+                        'noi_dung' => $this->createKeyValue1($row),
                         'nguoi_nhan' => $recipientEmail,
                         'nguoi_gui' => 'vhanh2k4@gmail.com',
                         'trang_thai' => 'chưa',
@@ -106,6 +109,7 @@ class CSendMail extends CI_Controller {
 
 	}
 
+// Lấy các mail chưa gửi trong database và thực hiện gửi 
 	public function sendMail(){
 		// ===============================
 		  // Bật tùy chọn cho phép script tiếp tục chạy khi người dùng đóng trình duyệt
@@ -165,6 +169,7 @@ class CSendMail extends CI_Controller {
 		}
 	}
 
+// Thử nghiệm gửi mail qua hàm exec - chưa thành công
 	public function sendMailAsync() {
 		$command = 'php sendMailCI/index.php CSend > /dev/null &';
 		exec($command, $output, $return_var);
@@ -177,69 +182,141 @@ class CSendMail extends CI_Controller {
 	}
 	
 
+// Tạo các placeholder từ nội dung được nhập vào
 	public function genPlaceHolder(){
-		 // Lấy nội dung từ request Ajax
-		 $emailContent = $this->input->post('email_content');
-		 $action = $this->input->post('action');  // Xác định nút được nhấn
-		 $listName = [];
+		// Lấy nội dung từ request Ajax
+		$emailContent = $this->input->post('email_content');
+		$listName = [];
 
-		 // Kiểm tra nếu có file Excel tải lên
-		 if (isset($_FILES['data_file']) && $_FILES['data_file']['error'] == UPLOAD_ERR_OK) {
-			 $filePath = $_FILES['data_file']['tmp_name'];
-			 $reader = new Xlsx();
-			 $spreadsheet = $reader->load($filePath);
-			 $sheet = $spreadsheet->getActiveSheet();
-			 $data = $sheet->toArray();
+		// Kiểm tra nếu có file Excel tải lên
+		if (isset($_FILES['data_file']) && $_FILES['data_file']['error'] == UPLOAD_ERR_OK) {
+			$filePath = $_FILES['data_file']['tmp_name'];
+			$reader = new Xlsx();
+			$spreadsheet = $reader->load($filePath);
+			$sheet = $spreadsheet->getActiveSheet();
+			$data = $sheet->toArray();
  
-			 if (!empty($data) && isset($data[0])) {
+			if (!empty($data) && isset($data[0])) {
 				$firstRow = $data[0];
-				 // Lưu vào database
-				 foreach ($firstRow as $index => $value) {
-					$nameValue = "cot_".($index+1);
+				foreach ($firstRow as $index => $value) {
+					$nameValue = $index;
 					$listName[$nameValue] = $value;					
-				 }
-			 }
-		 }
+				}
+			}
+		}
 
-		 // Kiểm tra chuỗi có chứa <<>> hay không
-		 preg_match_all('/<<([^>]+)>>/', $emailContent, $matches);
+		// Kiểm tra chuỗi có chứa <<>> hay không
+		preg_match_all('/<<([^>]+)>>/', $emailContent, $matches);
  
-		 if (!empty($matches[1])) {
-			 $placeholders = $matches[1]; // Lấy nội dung bên trong <<>>
- 
-			 // Tạo danh sách HTML các label và select
-			 $output = '';
-			 foreach ($placeholders as $placeholder) {
-				 $output .= '
-					 <label class="block text-gray-700 font-medium mb-2">' . htmlspecialchars($placeholder) . ':</label>
-					 <select name="' . htmlspecialchars($placeholder) . '" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200 focus:border-indigo-300 p-3 mb-4">
-					';
+		if (!empty($matches[1])) {
+			$placeholders = $matches[1]; // Lấy nội dung bên trong <<>>
+			$dem = 0;
+			// Tạo danh sách HTML các label và select
+			$output = '';
+			foreach ($placeholders as $placeholder) {
+				$dem++;
+				$output .= '
+					<label class="block text-gray-700 font-medium mb-2">' . htmlspecialchars($placeholder) . '(' . $dem . '):</label>
+					<select name= placeholders["' . htmlspecialchars($placeholder) . ']' . 
+					'" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200 focus:border-indigo-300 p-3 mb-4">';
 					foreach ($listName as $key => $val){
 						$output .= '<option value="'. htmlspecialchars($key) . '">'. htmlspecialchars($val) .'</option>';
 					}
-					$output .= '</select>';
-			 }
+				$output .= '</select>';
+			}
  
-			 // Trả về dữ liệu JSON
-			 echo json_encode(['status' => 'success', 'html' => $output]);
-		 } else {
-			 echo json_encode(['status' => 'error', 'message' => 'Không tìm thấy placeholder nào trong nội dung email.']);
-		 }
+			// Trả về dữ liệu JSON
+			echo json_encode(['status' => 'success', 'html' => $output]);
+		}else {
+			echo json_encode(['status' => 'error', 'message' => 'Không tìm thấy placeholder nào trong nội dung email.']);
+		}
 	}
 
-	//Tạo id random cho table template
+//Tạo id random cho table template
 	function generateId() {
 		// Tạo 3 chữ cái ngẫu nhiên
-		$letters = strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 3));
+		$letters = strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 2));
 	
 		// Lấy ngày, tháng, năm hiện tại
 		$day = date('d'); // Ngày
 		$month = date('m'); // Tháng
 		$year = date('y'); // Năm
 	
+		$randomNumber = mt_rand(1, 9); // Số ngẫu nhiên 4 chữ số
+
 		// Ghép các thành phần thành ID
-		$Id = $letters . $day . $month . $year;
+		$Id = $letters . $day . $month . $year . $randomNumber;
 	
 		return $Id;
 	}
+
+	public function ReContent($content){
+ 		// Định dạng regex để tìm các chuỗi trong <<>>
+ 			preg_match_all('/<<([^>]+)>>/', $content, $matches);
+		if (!empty($matches[0])) {
+			$placeholders = $matches[0]; // Mảng chứa các <<...>>
+			$count = 1;
+
+			foreach ($placeholders as $placeholder) {
+				// Thay thế từng <<>> bằng <<(n)key>>
+				$newPlaceholder = str_replace('<<', '<<(' . $count . ')', $placeholder);
+				$content = str_replace($placeholder, $newPlaceholder, $content);
+				$count++;
+			}
+		}
+	return $content;
+	}
+
+//Lấy key: value từ nội dung để lưu datasbase
+	// public function createKeyValue($content, $data){
+	// 	$selects = $this->input->post('placeholders'); // Các dữ liệu cột được chọn
+
+	// 	// Định dạng regex để tìm các chuỗi trong <<>>
+	// 	preg_match_all('/<<([^>]+)>>/', $content, $matches);
+
+	// 	$result = [];
+	// 	$out = '';
+	// 	if (!empty($matches[1])) {
+	// 		// Mảng chứa các từ khóa bên trong <<>>
+	// 		$placeholders = $matches[1];
+
+	// 		foreach ($placeholders as $index => $placeholder) {
+
+
+	// 			$key = '(' . ($index + 1) . ')' . $placeholder;
+	// 			$value = isset($placeholder) ? '' : '';
+	// 			$result[$key] = $value;
+
+	// 			$out .= '<' . $key . '::' . '>,';
+	// 			// Thay thế trong nội dung
+	// 			// $content = str_replace('<<' . $placeholder . '>>', '<<' . $key . '>>', $content);
+	// 		}
+	// 	}
+	// 	return $result;
+	// }
+
+	public function createKeyValue1($data){
+		$selects = $this->input->post('placeholders'); // Các dữ liệu cột được chọn
+		$dem = 0;
+		$out = '';
+		$result = [];
+		if (!empty($selects)) {
+			
+		foreach ($selects as $key => $value){
+			$place = '(' . ($dem + 1) . ')' . $key;
+			$valueph = isset($value) ? $data[$value] : '';
+			$result[$place] = $valueph;
+
+			$out .= '<' . $place . '::' . $valueph . '>,';
+			$dem++;
+	}
+		}
+		return $out;
+	}
+
+//Hàm trộn nội dung để gửi 
+	public function MergeMail(){
+
+	}
+
 }
