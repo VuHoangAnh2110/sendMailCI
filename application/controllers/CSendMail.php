@@ -136,6 +136,8 @@ class CSendMail extends CI_Controller {
 		$mail->SMTPKeepAlive = true; // add it to keep the SMTP connection open after each email sent
 
 		foreach($data as $mails){
+			$template = $this->MTemplate->get_template($mails->id_template);
+			$template_content = $template->content;
 			try {
 				$mail->clearAddresses();
 				$mail->clearAttachments();
@@ -150,17 +152,17 @@ class CSendMail extends CI_Controller {
 				//Content
 				$mail->isHTML(true);   
 				$mail->Subject = $subject;
-				$message = $mails->noi_dung;                               //Set email format to HTML
+				$message = $this->MergeMail($template_content,$mails->noi_dung);                    //Set email format to HTML
 				// $mail->Subject = 'Here is the subject';
 				$mail->Body = '<h2>' . $message . '</h2>';
 				// $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 	
 				if($mail->send()){
 					$status = '<h3 style="color:green;"> Mail Sent Successfully ! </h3>';
-					$this->MSendMail->update_mail($mails->id, 'thành công');
+					$this->MSendMail->update_mail($mails->id_mail, 'thành công');
 				}else{
 					$status = 'Mail Error: ' . $mail->ErrorInfo;
-					$this->MSendMail->update_mail($mails->id, 'lỗi rồi');
+					$this->MSendMail->update_mail($mails->id_mail, 'lỗi rồi');
 				}
 				// echo $status;
 			} catch (Exception $e) {
@@ -313,13 +315,31 @@ class CSendMail extends CI_Controller {
 	}
 
 //Hàm trộn nội dung để gửi 
-	public function MergeMail($content, $value){
+	public function MergeMail($content, $placeholders){
 		// Kiểm tra xem nội dung và danh sách key-value có hợp lệ không
-		if (empty($content) || empty($value)) {
+		if (empty($content) || empty($placeholders)) {
 			return $content; // Trả về nội dung gốc nếu không có gì để thay thế
 		}
 
-		
+		// Tách nội dung trộn thành các phần tử riêng biệt
+		$entries = explode(",", $placeholders);
+		$result = [];
+
+		// Lặp qua từng phần tử và tách key, value
+		foreach ($entries as $entry) {
+			// Loại bỏ ký tự không cần thiết
+			$entry = trim($entry, "<>"); // Loại bỏ ký tự '<' và '>'
+			list($key, $value) = explode("::", $entry); // Tách key và value
+			$result[$key] = $value;
+		}
+
+		foreach ($result as $ke => $val) {
+			// Tạo regex tìm placeholder trong nội dung
+			$placeholder = preg_quote($ke, '/'); // Đảm bảo ký tự đặc biệt không làm lỗi regex
+			$content = preg_replace('/' . $placeholder . '/', htmlspecialchars($val), $content);
+		}
+
+		return $content;
 	}
 
 }
