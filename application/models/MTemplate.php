@@ -16,15 +16,11 @@ class MTemplate extends CI_Model {
 
     // Lấy thông tin template theo ID
     public function get_template($id) {
-        if (is_numeric($id) && $id > 0) {
             $this->db->select("*");
             $this->db->from("template_mail");
-            $this->db->where("id_template ", $id);
+            $this->db->where("id_template", $id);
             $query = $this->db->get();
-            return $query->result();
-        } else {
-            return false;
-        }
+            return $query->row();
     }
 
     // Chèn template mới vào cơ sở dữ liệu
