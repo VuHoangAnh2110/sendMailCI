@@ -19,7 +19,7 @@ class MSendMail extends CI_Model {
         if (is_numeric($id) && $id > 0) {
             $this->db->select("*");
             $this->db->from("mail");
-            $this->db->where("id", $id);
+            $this->db->where("id_mail", $id);
             $query = $this->db->get();
             return $query->result();
         } else {
@@ -44,7 +44,7 @@ class MSendMail extends CI_Model {
 
     // Cập nhật trạng thái email sau khi gửi
     public function update_mail($id, $status) {
-        $this->db->where("id", $id);
+        $this->db->where("id_mail", $id);
         $this->db->update("mail", [
             "trang_thai" => $status,
             "thoi_gian_gui" => date("Y-m-d H:i:s") // Lưu thời gian gửi thành công
