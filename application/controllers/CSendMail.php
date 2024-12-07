@@ -329,14 +329,16 @@ class CSendMail extends CI_Controller {
 		foreach ($entries as $entry) {
 			// Loại bỏ ký tự không cần thiết
 			$entry = trim($entry, "<>"); // Loại bỏ ký tự '<' và '>'
-			list($key, $value) = explode("::", $entry); // Tách key và value
-			$result[$key] = $value;
+			if (strpos($entry, "::") !== false) {
+				list($key, $value) = explode("::", $entry, 2); // Chỉ chia thành 2 phần
+				$result[$key] = $value;
+			}
 		}
 
 		foreach ($result as $ke => $val) {
 			// Tạo regex tìm placeholder trong nội dung
 			$placeholder = preg_quote($ke, '/'); // Đảm bảo ký tự đặc biệt không làm lỗi regex
-			$content = preg_replace('/' . $placeholder . '/', htmlspecialchars($val), $content);
+			$content = preg_replace('/<<' . $placeholder . '>>/', htmlspecialchars($val), $content);
 		}
 
 		return $content;
