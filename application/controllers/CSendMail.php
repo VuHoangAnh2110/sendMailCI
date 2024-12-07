@@ -181,7 +181,6 @@ class CSendMail extends CI_Controller {
 		}
 	}
 	
-
 // Tạo các placeholder từ nội dung được nhập vào
 	public function genPlaceHolder(){
 		// Lấy nội dung từ request Ajax
@@ -217,7 +216,7 @@ class CSendMail extends CI_Controller {
 				$dem++;
 				$output .= '
 					<label class="block text-gray-700 font-medium mb-2">' . htmlspecialchars($placeholder) . '(' . $dem . '):</label>
-					<select name= placeholders["' . htmlspecialchars($placeholder) . ']' . 
+					<select name= "placeholders[' . htmlspecialchars($placeholder) . ']' . 
 					'" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200 focus:border-indigo-300 p-3 mb-4">';
 					foreach ($listName as $key => $val){
 						$output .= '<option value="'. htmlspecialchars($key) . '">'. htmlspecialchars($val) .'</option>';
@@ -295,28 +294,32 @@ class CSendMail extends CI_Controller {
 	// 	return $result;
 	// }
 
+
 	public function createKeyValue1($data){
 		$selects = $this->input->post('placeholders'); // Các dữ liệu cột được chọn
 		$dem = 0;
 		$out = '';
-		$result = [];
 		if (!empty($selects)) {
-			
-		foreach ($selects as $key => $value){
-			$place = '(' . ($dem + 1) . ')' . $key;
-			$valueph = isset($value) ? $data[$value] : '';
-			$result[$place] = $valueph;
+			foreach ($selects as $key => $value){
+				$place = '(' . ($dem + 1) . ')' . $key;
+				$valueph = isset($value) ? $data[$value] : '';
+				$result[$place] = $valueph;
 
-			$out .= '<' . $place . '::' . $valueph . '>,';
-			$dem++;
-	}
+				$out .= '<' . $place . '::' . $valueph . '>,';
+				$dem++;
+			}
 		}
 		return $out;
 	}
 
 //Hàm trộn nội dung để gửi 
-	public function MergeMail(){
+	public function MergeMail($content, $value){
+		// Kiểm tra xem nội dung và danh sách key-value có hợp lệ không
+		if (empty($content) || empty($value)) {
+			return $content; // Trả về nội dung gốc nếu không có gì để thay thế
+		}
 
+		
 	}
 
 }
