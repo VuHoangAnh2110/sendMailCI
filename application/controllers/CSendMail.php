@@ -15,7 +15,6 @@ class CSendMail extends CI_Controller {
         $this->load->helper('url');
 		$this->load->library('session');
 		$this->load->library('Lib_Mailer');
-
     }
 
 	/**
@@ -39,7 +38,6 @@ class CSendMail extends CI_Controller {
 		$data = array(
 			'title' => 'Send Mail',
             'base_url'=> base_url(),
-
 		);
 		
 		// print_r($_SESSION) ;
@@ -84,7 +82,7 @@ class CSendMail extends CI_Controller {
                     $recipientEmail = $row[0];
 				
                     $this->MSendMail->insert_mail([
-                        'noi_dung' => $this->createKeyValue1($row),
+                        'noi_dung' => $this->createKeyValue($row),
                         'nguoi_nhan' => $recipientEmail,
                         'nguoi_gui' => 'vhanh2k4@gmail.com',
                         'trang_thai' => 'chưa',
@@ -92,8 +90,8 @@ class CSendMail extends CI_Controller {
                     ]);
                 }
                 $this->session->set_flashdata('success', 'Đã lưu các email vào cơ sở dữ liệu.');
-				redirect(base_url());
 				echo json_encode(['type' => 'success', 'msg' => 'Thành công ', 'title' => 'OK!']);
+				redirect(base_url());
 			}
 		} else {
 			$this->session->set_flashdata('error', 'Có lỗi khi tải file Excel.');
@@ -106,7 +104,6 @@ class CSendMail extends CI_Controller {
 			// $this->sendMailAsync();
 			redirect(base_url());
 		}
-
 	}
 
 // Lấy các mail chưa gửi trong database và thực hiện gửi 
@@ -152,7 +149,7 @@ class CSendMail extends CI_Controller {
 				//Content
 				$mail->isHTML(true);   
 				$mail->Subject = $subject;
-				$message = $this->MergeMail($template_content,$mails->noi_dung);                    //Set email format to HTML
+				$message = $this->MergeMail($template_content,$mails->noi_dung);                 
 				// $mail->Subject = 'Here is the subject';
 				$mail->Body = '<h2>' . $message . '</h2>';
 				// $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
@@ -171,7 +168,7 @@ class CSendMail extends CI_Controller {
 		}
 	}
 
-// Thử nghiệm gửi mail qua hàm exec - chưa thành công
+// Thử nghiệm gửi mail qua hàm exec - chưa thành công =============================
 	public function sendMailAsync() {
 		$command = 'php sendMailCI/index.php CSend > /dev/null &';
 		exec($command, $output, $return_var);
@@ -182,6 +179,7 @@ class CSendMail extends CI_Controller {
 			echo "Failed to execute asynchronous email sending.";
 		}
 	}
+
 	
 // Tạo các placeholder từ nội dung được nhập vào
 	public function genPlaceHolder(){
@@ -227,9 +225,9 @@ class CSendMail extends CI_Controller {
 			}
  
 			// Trả về dữ liệu JSON
-			echo json_encode(['status' => 'success', 'html' => $output]);
+			echo json_encode(['status' => 'success', 'msg' => 'Đã tạo các placeholder.', 'title' => 'Thành công', 'html' => $output]);
 		}else {
-			echo json_encode(['status' => 'error', 'message' => 'Không tìm thấy placeholder nào trong nội dung email.']);
+			echo json_encode(['status' => 'error', 'msg' => 'Không tìm thấy placeholder nào.', 'title' => 'Lỗi']);
 		}
 	}
 
@@ -251,9 +249,10 @@ class CSendMail extends CI_Controller {
 		return $Id;
 	}
 
+//Chuẩn bị nội dung lưu vào datababse 
 	public function ReContent($content){
  		// Định dạng regex để tìm các chuỗi trong <<>>
- 			preg_match_all('/<<([^>]+)>>/', $content, $matches);
+ 		preg_match_all('/<<([^>]+)>>/', $content, $matches);
 		if (!empty($matches[0])) {
 			$placeholders = $matches[0]; // Mảng chứa các <<...>>
 			$count = 1;
@@ -268,38 +267,11 @@ class CSendMail extends CI_Controller {
 	return $content;
 	}
 
-//Lấy key: value từ nội dung để lưu datasbase
-	// public function createKeyValue($content, $data){
-	// 	$selects = $this->input->post('placeholders'); // Các dữ liệu cột được chọn
-
-	// 	// Định dạng regex để tìm các chuỗi trong <<>>
-	// 	preg_match_all('/<<([^>]+)>>/', $content, $matches);
-
-	// 	$result = [];
-	// 	$out = '';
-	// 	if (!empty($matches[1])) {
-	// 		// Mảng chứa các từ khóa bên trong <<>>
-	// 		$placeholders = $matches[1];
-
-	// 		foreach ($placeholders as $index => $placeholder) {
-
-
-	// 			$key = '(' . ($index + 1) . ')' . $placeholder;
-	// 			$value = isset($placeholder) ? '' : '';
-	// 			$result[$key] = $value;
-
-	// 			$out .= '<' . $key . '::' . '>,';
-	// 			// Thay thế trong nội dung
-	// 			// $content = str_replace('<<' . $placeholder . '>>', '<<' . $key . '>>', $content);
-	// 		}
-	// 	}
-	// 	return $result;
-	// }
-
-
-	public function createKeyValue1($data){
+// Tạo key - value để lưu vào database
+	public function createKeyValue($data){
 		$selects = $this->input->post('placeholders'); // Các dữ liệu cột được chọn
 		$dem = 0;
+		$result = [];
 		$out = '';
 		if (!empty($selects)) {
 			foreach ($selects as $key => $value){
@@ -316,7 +288,6 @@ class CSendMail extends CI_Controller {
 
 //Hàm trộn nội dung để gửi 
 	public function MergeMail($content, $placeholders){
-		// Kiểm tra xem nội dung và danh sách key-value có hợp lệ không
 		if (empty($content) || empty($placeholders)) {
 			return $content; // Trả về nội dung gốc nếu không có gì để thay thế
 		}
@@ -343,5 +314,8 @@ class CSendMail extends CI_Controller {
 
 		return $content;
 	}
+
+//Xem trước nội dung
+
 
 }
