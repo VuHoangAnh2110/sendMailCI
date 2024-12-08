@@ -3,9 +3,9 @@
 <div id="content" class="grid grid-col-1 border-gray-900/10">
     <div class="p-5">
         <form method="post" id="mailForm" enctype="multipart/form-data" action="send">
-            <div class="grid sm:grid-cols-6 mx-20 p-1">           
+            <div class="grid sm:grid-cols-6 sm:mx-20 p-1">           
                 <div class="sm:col-span-4">
-                    <div class=" border-red-800 bg-gray-100 rounded-lg shadow-md mr-10 p-5">
+                    <div class=" border-red-800 bg-gray-100 rounded-lg shadow-md sm:mr-10 p-5">
                         <h1 class="text-2xl font-bold mb-4 w-[90%]">Trộn thư và gửi email</h1>
                         <!-- Ô nhập tiêu đề email -->
                         <div class="mb-4 w-[90%]">
@@ -44,28 +44,36 @@
                             class="text-gray-700 border w-full border-gray-300 rounded-md p-2">
                         </div>
                         
+                        <div class="mt-5 grid grid-cols-4 gap-5">
                         <!-- Nút để lưu vào database -->
-                        <button type="submit" name="action" value="save" 
-                        class="w-50 bg-gray-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-600">
-                            Lưu vào database
-                        </button>
+                            <button type="submit" name="action" value="save" 
+                            class="col-span-2 w-2/3 bg-indigo-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-600">
+                                Lưu Database
+                            </button>
 
                         <!-- Nút để trộn và gửi email -->
-                        <button type="submit" name="action" value="send" 
-                        class="w-50 bg-indigo-500 text-white font-bold py-2 px-4 rounded hover:bg-indigo-600">
-                            Trộn và gửi email
-                        </button>
+                            <button type="submit" name="action" value="send" 
+                            class="col-span-2 w-2/3 bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-gray-500">
+                                Trộn và Gửi
+                            </button>
 
-                        <!-- <button type="submit" name="action" value="gen"  -->
-                        <button type="button" id="genph"
-                        class="w-50 bg-gray-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-600">
-                            Chọn placeholder
-                        </button>
+                        <!-- Tìm kiếm và tạo các place holder từ nội dung  -->
+                            <button type="button" id="genph"
+                            class="col-span-2 w-2/3 bg-indigo-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-600">
+                                Tạo Placeholder
+                            </button>
+
+                        <!-- Xem trước email khi đã trộn  -->
+                            <button type="button" id="btnpreview"
+                            class="col-span-2 w-2/3 bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-gray-500">
+                                Xem Trước
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Tự xuất các place holder để người dùng chọn -->
-                <div id="placeholders" class="sm:col-span-2 ">
+                <div id="placeholders" class="sm:col-span-2 mt-5 sm:mt-0">
                     <div class="bg-gray-100 border-blue-800 rounded-lg shadow-md p-5">
                         <h1 class="text-2xl font-bold mb-4">Select Placeholder</h1>
                         <!-- Add placeholder -->
