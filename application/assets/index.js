@@ -104,57 +104,58 @@ function add(){
     });
 
 // cách 2:
-$(document).ready(function () {
-    $('#genph1').on('click', function () {
-        let emailContent = $('#email_content').val();
+    $(document).ready(function () {
+        $('#genph1').on('click', function () {
+            let emailContent = $('#email_content').val();
 
-        $.ajax({
-            url: 'CSendMail/genPlaceHolder', // Đường dẫn tới controller
-            type: 'POST',
-            data: { email_content: emailContent },
-            dataType: 'json',
-            success: function (response) {
-                if (response.status === 'success') {
-                    $('#addplace').html(response.html); // InnerHTML với kết quả từ server
-                } else {
-                    alert(response.message); // Hiển thị lỗi nếu không tìm thấy placeholder
+            $.ajax({
+                url: 'CSendMail/genPlaceHolder', // Đường dẫn tới controller
+                type: 'POST',
+                data: { email_content: emailContent },
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status === 'success') {
+                        $('#addplace').html(response.html); // InnerHTML với kết quả từ server
+                    } else {
+                        alert(response.message); // Hiển thị lỗi nếu không tìm thấy placeholder
+                    }
+                },
+                error: function () {
+                    alert('Đã xảy ra lỗi trong quá trình xử lý.');
                 }
-            },
-            error: function () {
-                alert('Đã xảy ra lỗi trong quá trình xử lý.');
-            }
+            });
         });
     });
-});
 
 // Cách 3: formdata
-$(document).ready(function () {
-    $('#genph').on('click', function () {
-        let emailContent = $('#email_content').val();
-        var formData = new FormData($('#mailForm')[0]);
+    $(document).ready(function () {
+        $('#genph').on('click', function () {
+            var formData = new FormData($('#mailForm')[0]);
 
-        formData.append('data_file', $('#data_file')[0].files[0]);
-        formData.append('email_content', $('#email_content').val()); // Nội dung email
+            formData.append('data_file', $('#data_file')[0].files[0]);
+            formData.append('email_content', $('#email_content').val()); // Nội dung email
 
-        $.ajax({
-            url: 'CSendMail/genPlaceHolder', // Đường dẫn tới controller
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                var result = JSON.parse(response);
+            $.ajax({
+                url: 'CSendMail/genPlaceHolder', // Đường dẫn tới controller
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    var result = JSON.parse(response);
 
-                if (result.status === 'success') {
-                    $('#addplace').html(result.html); // InnerHTML với kết quả từ server
-                } else {
-                    alert(result.message); // Hiển thị lỗi nếu không tìm thấy placeholder
+                    if (result.status === 'success') {
+                        $('#addplace').html(result.html); // InnerHTML với kết quả từ server
+                        ThongBao(result.status, result.msg, result.title);
+                    } else {
+                        // alert(result.message); // Hiển thị lỗi nếu không tìm thấy placeholder
+                        ThongBao(result.status, result.msg, result.title);
+                    }
+                },
+                error: function () {
+                    ThongBao('error', 'Đã có lỗi trong khi xử lý!', 'Lỗi');
                 }
-            },
-            error: function () {
-                alert('Đã xảy ra lỗi trong quá trình xử lý.');
-            }
+            });
         });
     });
-});
 
