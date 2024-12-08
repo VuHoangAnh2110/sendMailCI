@@ -17,8 +17,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     
 </head>
 
-<body class="bg-blue-100 pb-16">
-    <div class="">
+<body class="bg-blue-100">
+    <div class="pb-16">
         <div id="header" class="border-2 bg-opacity-30 bg-green-500 p-5">
             <h1 class="flex justify-center text-xl"> Xin chào đến với Hoàng Anh Channel! </h1>
         </div>
