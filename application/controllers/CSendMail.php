@@ -180,7 +180,6 @@ class CSendMail extends CI_Controller {
 		}
 	}
 
-	
 // Tạo các placeholder từ nội dung được nhập vào
 	public function genPlaceHolder(){
 		// Lấy nội dung từ request Ajax
@@ -316,6 +315,61 @@ class CSendMail extends CI_Controller {
 	}
 
 //Xem trước nội dung
+	public function previewMail (){
+		$emailContent = $this->input->post('email_content');
+		$out = '';
+		$titleMail = $this->input->post('email_subject');
+		$senderName = $this->input->post('sender_name');
 
+		// Kiểm tra nếu có file Excel tải lên
+		if (isset($_FILES['data_file']) && $_FILES['data_file']['error'] == UPLOAD_ERR_OK) {
+			$filePath = $_FILES['data_file']['tmp_name'];
+			$reader = new Xlsx();
+			$spreadsheet = $reader->load($filePath);
+			$sheet = $spreadsheet->getActiveSheet();
+			$data = $sheet->toArray();
+ 
+			if (!empty($data) && isset($data[1])) {
+				$firstRow = $data[1];
+				$dataMail = $this->createKeyValue($firstRow);		
+				$emailer = $firstRow[0];
+			}
+
+			$mail = $this->MergeMail($this->ReContent($emailContent) ,$dataMail);
+
+			if(isset($mail)){
+				$out .= '
+					<div class="w-full bg-white shadow-lg rounded-lg p-6">
+						<div class="border-b pb-4 mb-4">
+							<h1 class="text-xl font-semibold text-gray-800">'. $titleMail . '</h1>
+						</div>
+					<!-- Người gửi -->
+						<div class="mb-4">
+							<p class="text-sm font-medium text-gray-600">From:</p>
+							<p class="text-gray-800 font-semibold">' . $senderName . '(vhanh2k4@example.com)</p>
+						</div>
+					<!-- Người nhận -->
+						<div class="mb-4">
+							<p class="text-sm font-medium text-gray-600">To:</p>
+							<p class="text-gray-800 font-semibold">(' . $emailer . ')</p>
+						</div>
+						<div>
+							<p class="text-sm font-medium text-gray-600">Message:</p>
+							<div class="bg-gray-50 p-4 rounded border border-gray-200 text-gray-800">' .
+							$mail .
+							'</div>
+						</div>
+					</div>';
+					
+				echo json_encode(['status' => 'success', 'msg' => 'Có dữ liệu xem.', 'title' => 'Thành công', 'html' => $out]);
+			}else{
+				echo json_encode(['status' => 'error', 'msg' => 'Không có dữ liệu xem trước.', 'title' => 'Lỗi']);
+			}
+		}else{
+			echo json_encode(['status' => 'error', 'msg' => 'Chưa có file đẩy lên', 'title' => 'Lỗi']);
+		}
+	}
 
 }
+
+	
