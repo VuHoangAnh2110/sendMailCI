@@ -162,6 +162,7 @@ function add(){
     $(document).ready(function(){
         $('#btnpreview').on('click', function(){
             var formData = new FormData($('#mailForm')[0]);
+            
 
             $.ajax({
                 url: 'CSendMail/previewMail',
@@ -187,4 +188,5 @@ function add(){
             })
         });
     });
+
 
