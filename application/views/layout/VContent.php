@@ -48,25 +48,25 @@
                         <!-- Nút để lưu vào database -->
                             <button type="submit" name="action" value="save" 
                             class="col-span-2 w-2/3 bg-indigo-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-600">
-                                Lưu Database
+                                3.Lưu Database
                             </button>
 
                         <!-- Nút để trộn và gửi email -->
                             <button type="submit" name="action" value="send" 
                             class="col-span-2 w-2/3 bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-gray-500">
-                                Trộn và Gửi
+                                4.Trộn và Gửi
                             </button>
 
                         <!-- Tìm kiếm và tạo các place holder từ nội dung  -->
                             <button type="button" id="genph"
                             class="col-span-2 w-2/3 bg-indigo-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-600">
-                                Tạo Placeholder
+                                1.Tạo Placeholder
                             </button>
 
                         <!-- Xem trước email khi đã trộn  -->
                             <button type="button" id="btnpreview"
                             class="col-span-2 w-2/3 bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-gray-500">
-                                Xem Trước
+                                2.Xem Trước
                             </button>
                         </div>
                     </div>
@@ -87,7 +87,8 @@
         <!-- Ô xem trước nội dung sau khi lưu vào database -->
         <div id="preview" class="mt-8 hidden bg-gray-100 p-4 rounded-md shadow-inner mb-10">
             <h2 class="text-xl font-bold mb-2">Xem trước nội dung email</h2>
-            <p id="preview_content" class="text-gray-700"></p>
+            <div id="preview_content">
+            </div>
         </div>
     </div>
 </div>
