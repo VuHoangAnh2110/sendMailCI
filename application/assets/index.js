@@ -159,3 +159,32 @@ function add(){
         });
     });
 
+    $(document).ready(function(){
+        $('#btnpreview').on('click', function(){
+            var formData = new FormData($('#mailForm')[0]);
+
+            $.ajax({
+                url: 'CSendMail/previewMail',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    var result = JSON.parse(response);
+
+                    if (result.status === 'success') {
+                        $('#preview').show();
+                        $('#preview_content').html(result.html); // InnerHTML với kết quả từ server
+                        ThongBao(result.status, result.msg, result.title);
+                    } else {
+                        // alert(result.message);
+                        ThongBao(result.status, result.msg, result.title);
+                    }
+                },
+                error: function () {
+                    ThongBao('error', 'Đã có lỗi trong khi xử lý!', 'Lỗi');
+                }
+            })
+        });
+    });
+
