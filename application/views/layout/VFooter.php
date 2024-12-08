@@ -2,7 +2,9 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 
-        <div id="footer" class="fixed bottom-0 left-0 w-full bg-green-200 bg-opacity-100 border-t-2 p-2 flex justify-between items-center">
+</div>
+
+        <div id="footer" class=" bottom-0 left-0 w-full bg-green-200 bg-opacity-100 border-t-2 p-2 flex justify-between items-center">
             <div class="text-sm ml-10">
                 Địa điểm: 96 Định Công - Hoàng Mai - Hà Nội
                 <br>
