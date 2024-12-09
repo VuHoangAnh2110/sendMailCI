@@ -301,6 +301,7 @@ class CSendMail extends CI_Controller {
 			$entry = trim($entry, "<>"); // Loại bỏ ký tự '<' và '>'
 			if (strpos($entry, "::") !== false) {
 				list($key, $value) = explode("::", $entry, 2); // Chỉ chia thành 2 phần
+				
 				$result[$key] = $value;
 			}
 		}
@@ -355,7 +356,7 @@ class CSendMail extends CI_Controller {
 						</div>
 						<div>
 							<p class="text-sm font-medium text-gray-600">Message:</p>
-							<div class="bg-gray-50 p-4 rounded border border-gray-200 text-gray-800">' .
+							<div class="mt-2 bg-gray-50 p-4 rounded border border-gray-200 text-gray-800">' .
 							$mail .
 							'</div>
 						</div>
@@ -363,7 +364,7 @@ class CSendMail extends CI_Controller {
 					
 				echo json_encode(['status' => 'success', 'msg' => 'Có dữ liệu xem.', 'title' => 'Thành công', 'html' => $out]);
 			}else{
-				echo json_encode(['status' => 'error', 'msg' => 'Không có dữ liệu xem trước.', 'title' => 'Lỗi']);
+				echo json_encode(['status' => 'warning', 'msg' => 'Không có dữ liệu xem trước.', 'title' => 'Thông báo']);
 			}
 		}else{
 			echo json_encode(['status' => 'error', 'msg' => 'Chưa có file đẩy lên', 'title' => 'Lỗi']);
