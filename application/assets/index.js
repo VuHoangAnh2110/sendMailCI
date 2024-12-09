@@ -1,6 +1,30 @@
 // Thong báo toastr
-$(document).ready(function(){
-    $('#button').on('click', function(){
+    $(document).ready(function(){
+        $('#button').on('click', function(){
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": true,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "2000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+
+            toastr["success"]("Đã có thông báo xịn <3", "Test!")
+        });
+    });
+
+
+    function ThongBao(type, msg, title){
         toastr.options = {
             "closeButton": true,
             "debug": false,
@@ -18,53 +42,29 @@ $(document).ready(function(){
             "showMethod": "fadeIn",
             "hideMethod": "fadeOut"
         };
-
-        toastr["success"]("Đã có thông báo xịn <3", "Test!")
-    });
-});
-
-
-function ThongBao(type, msg, title){
-    toastr.options = {
-        "closeButton": true,
-        "debug": false,
-        "newestOnTop": false,
-        "progressBar": true,
-        "positionClass": "toast-top-right",
-        "preventDuplicates": true,
-        "onclick": null,
-        "showDuration": "300",
-        "hideDuration": "1000",
-        "timeOut": "2000",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
+        toastr[type](msg, title);
     };
-    toastr[type](msg, title);
-};
 
 // =====================================================================
-function add(){
-    let formData = new FormData($('#mailForm')[0]);
-    $.ajax({
-        url: 'send',
-        method: 'POST',
-        data: formData,
-        contentType: false, // Không đặt contentType
-        processData: false, // Không xử lý dữ liệu
-        success: function(response) {
-            const result = JSON.parse(response);
-            $('#mailForm')[0].reset(); 
-            ThongBao(result.type, result.msg, result.title);
-        },
-        error: function() {
-            ThongBao("error", "Đã xảy ra lỗi khi gửi dữ liệu!", "Lỗi");
-        }
-    });
-    return false; // Ngăn chặn việc tải lại trang
-}
+    function add(){
+        let formData = new FormData($('#mailForm')[0]);
+        $.ajax({
+            url: 'send',
+            method: 'POST',
+            data: formData,
+            contentType: false, // Không đặt contentType
+            processData: false, // Không xử lý dữ liệu
+            success: function(response) {
+                const result = JSON.parse(response);
+                $('#mailForm')[0].reset(); 
+                ThongBao(result.type, result.msg, result.title);
+            },
+            error: function() {
+                ThongBao("error", "Đã xảy ra lỗi khi gửi dữ liệu!", "Lỗi");
+            }
+        });
+        return false; // Ngăn chặn việc tải lại trang
+    }
 // =====================================================================
 
 // Bắt các placeholder khi nhập vào input ========================================================
@@ -135,58 +135,108 @@ function add(){
             formData.append('data_file', $('#data_file')[0].files[0]);
             formData.append('email_content', $('#email_content').val()); // Nội dung email
 
-            $.ajax({
-                url: 'CSendMail/genPlaceHolder', // Đường dẫn tới controller
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    var result = JSON.parse(response);
-
-                    if (result.status === 'success') {
-                        $('#addplace').html(result.html); // InnerHTML với kết quả từ server
-                        ThongBao(result.status, result.msg, result.title);
-                    } else {
-                        // alert(result.message); // Hiển thị lỗi nếu không tìm thấy placeholder
-                        ThongBao(result.status, result.msg, result.title);
+            if(checkNull()){
+                $.ajax({
+                    url: 'CSendMail/genPlaceHolder', // Đường dẫn tới controller
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        var result = JSON.parse(response);
+    
+                        if (result.status === 'success') {
+                            $('#addplace').hide().html(result.html).slideDown(); // InnerHTML với kết quả từ server
+                            ThongBao(result.status, result.msg, result.title);
+                        } else {
+                            // alert(result.message); // Hiển thị lỗi nếu không tìm thấy placeholder
+                            ThongBao(result.status, result.msg, result.title);
+                        }
+                    },
+                    error: function () {
+                        ThongBao('error', 'Đã có lỗi trong khi xử lý!', 'Lỗi');
                     }
-                },
-                error: function () {
-                    ThongBao('error', 'Đã có lỗi trong khi xử lý!', 'Lỗi');
-                }
-            });
+                });
+            } else {
+                ThongBao('warning', 'Vui lòng điền hết thông tin!', 'Nhắc nhở')
+            }
+            
         });
     });
 
-    $(document).ready(function(){
+    $(document).ready(function () {
         $('#btnpreview').on('click', function(){
             var formData = new FormData($('#mailForm')[0]);
-            
 
-            $.ajax({
-                url: 'CSendMail/previewMail',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    var result = JSON.parse(response);
-
-                    if (result.status === 'success') {
-                        $('#preview').show();
-                        $('#preview_content').html(result.html); // InnerHTML với kết quả từ server
-                        ThongBao(result.status, result.msg, result.title);
-                    } else {
-                        // alert(result.message);
-                        ThongBao(result.status, result.msg, result.title);
+            if(checkNull()){
+                $.ajax({
+                    url: 'CSendMail/previewMail',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        var result = JSON.parse(response);
+    
+                        if (result.status === 'success') {
+                            $('#preview_content').html(result.html); // InnerHTML với kết quả từ server
+                            $('#preview').fadeIn(1800);
+                            ThongBao(result.status, result.msg, result.title);
+                        } else {
+                            // alert(result.message);
+                            ThongBao(result.status, result.msg, result.title);
+                        }
+                    },
+                    error: function () {
+                        ThongBao('error', 'Đã có lỗi trong khi xử lý!', 'Lỗi');
                     }
-                },
-                error: function () {
-                    ThongBao('error', 'Đã có lỗi trong khi xử lý!', 'Lỗi');
-                }
-            })
+                })
+            } else {
+                ThongBao('warning', 'Vui lòng điền hết thông tin!', 'Nhắc nhở')
+            }
         });
     });
 
+//kiểm tra rỗng
+    function checkNull(){
+        $('.requiredStar').addClass('hidden');
+
+        let checkInputs = $('.inputForm').filter(function (){
+            return $(this).val().trim() === '';
+        });
+
+        checkInputs.each(function (){
+            $(this).parent().find('.requiredStar').removeClass('hidden');
+        });
+
+        if (checkInputs.length > 0){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    $(document).ready(function () {
+        $('#email_subject').on('keydown', function (){
+            $(this).parent().find('.requiredStar').addClass('hidden');
+        });
+    });
+
+    $(document).ready(function () {
+        $('#sender_name').on('keydown', function (){
+            $(this).parent().find('.requiredStar').addClass('hidden');
+        });
+    });
+
+    $(document).ready(function () {
+        $('#email_content').on('keydown', function (){
+            $(this).parent().find('.requiredStar').addClass('hidden');
+        });
+    });
+
+    $(document).ready(function () {
+        $('#data_file').on('change', function (){
+            $(this).parent().find('.requiredStar').addClass('hidden');
+        });
+    });
 
