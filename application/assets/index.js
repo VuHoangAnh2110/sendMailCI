@@ -164,6 +164,7 @@
         });
     });
 
+//
     $(document).ready(function () {
         $('#btnpreview').on('click', function(){
             var formData = new FormData($('#mailForm')[0]);
