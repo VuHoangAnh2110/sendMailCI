@@ -198,7 +198,7 @@ class CSendMail extends CI_Controller {
 				$firstRow = $data[0];
 				foreach ($firstRow as $index => $value) {
 					$nameValue = $index;
-					$listName[$nameValue] = $value;					
+					$listName[$nameValue] = trim($value);					
 				}
 			}
 		}
@@ -214,11 +214,11 @@ class CSendMail extends CI_Controller {
 			foreach ($placeholders as $placeholder) {
 				$dem++;
 				$output .= '
-					<label class="block text-gray-700 font-medium mb-2">' . htmlspecialchars($placeholder) . '(' . $dem . '):</label>
-					<select name= "placeholders[' . htmlspecialchars($placeholder) . ']' . 
+					<label class="block text-gray-700 font-medium mb-2">' . trim(htmlspecialchars($placeholder)) . '(' . $dem . '):</label>
+					<select name= "placeholders[' . trim(htmlspecialchars($placeholder)) . ']' . 
 					'" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200 focus:border-indigo-300 p-3 mb-4">';
 					foreach ($listName as $key => $val){
-						$output .= '<option value="'. htmlspecialchars($key) . '">'. htmlspecialchars($val) .'</option>';
+						$output .= '<option value="'. htmlspecialchars($key) . '">'. trim(htmlspecialchars($val)) .'</option>';
 					}
 				$output .= '</select>';
 			}
@@ -257,13 +257,15 @@ class CSendMail extends CI_Controller {
 			$count = 1;
 
 			foreach ($placeholders as $placeholder) {
+				$placeholder1 = trim($placeholder, "<>");
+				$placeholder1 = trim($placeholder1);
 				// Thay thế từng <<>> bằng <<(n)key>>
-				$newPlaceholder = str_replace('<<', '<<(' . $count . ')', $placeholder);
+				$newPlaceholder = '<<(' . $count . ')' . $placeholder1 .'>>';
 				$content = str_replace($placeholder, $newPlaceholder, $content);
 				$count++;
 			}
 		}
-	return $content;
+		return $content;
 	}
 
 // Tạo key - value để lưu vào database
@@ -274,11 +276,11 @@ class CSendMail extends CI_Controller {
 		$out = '';
 		if (!empty($selects)) {
 			foreach ($selects as $key => $value){
-				$place = '(' . ($dem + 1) . ')' . $key;
-				$valueph = isset($value) ? $data[$value] : '';
+				$place = '(' . ($dem + 1) . ')' . trim($key);
+				$valueph = isset($value) ? trim($data[$value]) : '';
 				$result[$place] = $valueph;
 
-				$out .= '<' . $place . '::' . $valueph . '>,';
+				$out .= '<' . trim($place) . '::' . $valueph . '>,';
 				$dem++;
 			}
 		}
@@ -301,7 +303,14 @@ class CSendMail extends CI_Controller {
 			$entry = trim($entry, "<>"); // Loại bỏ ký tự '<' và '>'
 			if (strpos($entry, "::") !== false) {
 				list($key, $value) = explode("::", $entry, 2); // Chỉ chia thành 2 phần
-				
+				$key = trim($key);
+				$value = trim($value);
+				// Đề xuất bổ sung:
+					// Nếu bạn cần loại bỏ thêm các ký tự cụ thể (ngoài khoảng trắng) 
+					// như tab hoặc newline (\t, \n), bạn có thể dùng preg_replace() để thay thế:
+					// Loại bỏ các khoảng trắng thừa và chuẩn hóa thành một khoảng trắng duy nhất
+					// $key = preg_replace('/\s+/', ' ', trim($key)); 
+					// $value = preg_replace('/\s+/', ' ', trim($value));
 				$result[$key] = $value;
 			}
 		}
@@ -347,7 +356,7 @@ class CSendMail extends CI_Controller {
 					<!-- Người gửi -->
 						<div class="mb-4">
 							<p class="text-sm font-medium text-gray-600">From:</p>
-							<p class="text-gray-800 font-semibold">' . $senderName . '(vhanh2k4@example.com)</p>
+							<p class="text-gray-800 font-semibold">' . $senderName . ' (vhanh2k4@gmail.com)</p>
 						</div>
 					<!-- Người nhận -->
 						<div class="mb-4">
