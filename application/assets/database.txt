@@ -1,0 +1,40 @@
+database: test
+table: template_mail {
+    id_template: varchar - 10 - id được tạo có cấu trúc trong controller.php
+    content: text - nội dung thư trộn
+}
+
+table: mail {
+    id_mail: int - auto increment
+    noi_dung: text - chứa các key_value để thay thế vào placeholder
+    trang_thai: varchar - 20 - trạng thái của mail gửi hay chưa
+    ngươi_nhan: varchar - 50 - email người nhận
+    nguoi_gui: varchar - 50 - email người gửi
+    thoi_gian_tao: timestamp - thời gian email được tạo và đưa vào database
+    thoi_gian_gui: timestamp - thời gian email được gửi đi
+    id_template: varchar - 10 - id của template thư để trộn
+}
+
+* template_mail: 1 - n :mail
+
+* ví dụ:
+id_template:  PJ1212249
+content:      Xin chào bạn <<(1)name>> có ngày sinh <<(2)birthday>> với email <<(3)email>>. Bye
+                                || || ||
+id_mail:        310
+noi_dung:       <(1)name::Hồng Ánh>,<(2)birthday::15/9/2001>,<(3)e...
+trang_thai:     thành công
+ngươi_nhan:     22a1001d0029@students.hou.edu.vn
+thoi_gian_gui:  2024-12-12 06:22:16
+thoi_gian_tao:  2024-12-12 13:21:22
+nguoi_gui:      vhanh2k4@gmail.com
+id_template:    PJ1212249
+            +   +   +
+id_mail:        311
+noi_dung:       <(1)name::Tâm Xuân>,<(2)birthday::21/08/2004>,<(3)...
+trang_thai:     chưa
+ngươi_nhan:     22a1001d0378@students.hou.edu.vn
+thoi_gian_gui:  0000-00-00 00:00:00
+thoi_gian_tao:  2024-12-12 13:21:22
+nguoi_gui:      vhanh2k4@gmail.com
+id_template:    PJ1212249
